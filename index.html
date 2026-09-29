@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Job Dashboard</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f3f5f0;
+      --surface: #ffffff;
+      --surface-2: #e9ede6;
+      --surface-3: #dce4d9;
+      --ink: #172019;
+      --muted: #5d6a60;
+      --line: #d2d9cf;
+      --accent: #126b47;
+      --accent-strong: #084f34;
+      --accent-soft: #d8efe3;
+      --blue: #176b87;
+      --blue-soft: #dcedf2;
+      --amber: #9a5b07;
+      --amber-soft: #f8e8c8;
+      --danger: #a33d33;
+      --shadow: 0 18px 50px rgba(32, 50, 38, .09);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111512;
+        --surface: #1a201c;
+        --surface-2: #222a25;
+        --surface-3: #2c3730;
+        --ink: #edf3ee;
+        --muted: #aebbb1;
+        --line: #354239;
+        --accent: #61d39b;
+        --accent-strong: #8ee5b8;
+        --accent-soft: #173b2a;
+        --blue: #73c7e0;
+        --blue-soft: #173543;
+        --amber: #f0bd68;
+        --amber-soft: #463317;
+        --danger: #ff9e93;
+        --shadow: 0 20px 60px rgba(0, 0, 0, .25);
+      }
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--bg); }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        linear-gradient(90deg, color-mix(in srgb, var(--line) 30%, transparent) 1px, transparent 1px) 0 0 / 68px 68px,
+        var(--bg);
+      color: var(--ink);
+      font-family: "IBM Plex Sans", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, select { font: inherit; }
+    a { color: inherit; }
+    .wrap { width: min(1500px, 100%); margin: 0 auto; padding: 32px 28px 48px; }
+    .intro {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 28px;
+      align-items: end;
+      padding: 14px 0 28px;
+    }
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--accent);
+      font: 600 12px/1.2 "IBM Plex Mono", monospace;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin: 0 0 12px;
+    }
+    .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 5px var(--accent-soft); }
+    h1 { margin: 0; max-width: 840px; font-size: clamp(34px, 5.5vw, 68px); line-height: .98; letter-spacing: -.045em; }
+    .intro p { color: var(--muted); font-size: 15px; margin: 15px 0 0; }
+    .download {
+      display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+      border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+      padding: 11px 15px; min-height: 44px; cursor: pointer; font-weight: 600;
+      border-radius: 9px; box-shadow: 0 4px 16px rgba(0,0,0,.04);
+    }
+    .download:hover { border-color: var(--accent); color: var(--accent-strong); }
+    .download svg { width: 17px; height: 17px; }
+    .stats {
+      display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+      background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .stat { padding: 22px 24px; min-height: 112px; border-right: 1px solid var(--line); }
+    .stat:last-child { border-right: 0; }
+    .stat span { display: block; color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+    .stat strong { font: 600 36px/1 "IBM Plex Mono", monospace; letter-spacing: -.05em; }
+    .stat:nth-child(2) strong { color: var(--accent); }
+    .stat:nth-child(3) strong { color: var(--blue); }
+    .stat:nth-child(4) strong { color: var(--amber); }
+    .controls {
+      margin-top: 22px; display: grid; grid-template-columns: minmax(280px, 1.5fr) repeat(3, minmax(150px, .65fr)) auto;
+      gap: 10px; align-items: end; padding: 15px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    }
+    .field label { display: block; margin: 0 0 7px; color: var(--muted); font-size: 12px; font-weight: 600; }
+    .input-wrap { position: relative; }
+    .input-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 17px; height: 17px; color: var(--muted); pointer-events: none; }
+    input, select {
+      width: 100%; min-height: 43px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px;
+      background: var(--bg); color: var(--ink); outline: none;
+    }
+    input { padding-left: 39px; }
+    input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .reset { min-height: 43px; padding: 9px 13px; border: 0; background: transparent; color: var(--muted); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+    .reset:hover { color: var(--ink); }
+    .results-bar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 25px 2px 12px; }
+    .results-bar h2 { margin: 0; font-size: 19px; letter-spacing: -.015em; }
+    .results-bar p { margin: 0; color: var(--muted); font-size: 13px; }
+    .table-shell { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--surface); box-shadow: var(--shadow); }
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    col.company { width: 12%; } col.role { width: 21%; } col.location { width: 13%; } col.type { width: 9%; }
+    col.posted { width: 8%; } col.pay { width: 10%; } col.details { width: 20%; } col.action { width: 7%; }
+    thead th {
+      padding: 14px 12px; text-align: left; color: var(--muted); background: var(--surface-2);
+      border-bottom: 1px solid var(--line); font: 600 11px/1.2 "IBM Plex Mono", monospace; letter-spacing: .03em; text-transform: uppercase;
+    }
+    tbody td { padding: 17px 12px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 13px; line-height: 1.43; overflow-wrap: anywhere; }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:hover { background: color-mix(in srgb, var(--accent-soft) 35%, var(--surface)); }
+    .company-name { font-weight: 700; line-height: 1.25; }
+    .role-title { font-weight: 600; font-size: 14px; line-height: 1.35; }
+    .family { display: inline-flex; margin-top: 8px; padding: 3px 6px; color: var(--accent-strong); background: var(--accent-soft); border-radius: 4px; font: 600 10px/1.2 "IBM Plex Mono", monospace; }
+    .location-text, .meta { color: var(--muted); }
+    .type-badge { display: inline-block; padding: 4px 7px; border-radius: 5px; background: var(--blue-soft); color: var(--blue); font-weight: 600; font-size: 11px; }
+    .posted-recent { color: var(--accent-strong); font-weight: 700; }
+    .pay { font-weight: 700; }
+    .notes { margin-top: 7px; color: var(--muted); }
+    .notes::before { content: "Note: "; font-weight: 600; }
+    .apply {
+      display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px;
+      border: 1px solid var(--line); border-radius: 7px; color: var(--accent-strong); background: var(--surface); text-decoration: none;
+    }
+    .apply:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .apply svg { width: 16px; height: 16px; }
+    .empty { display: none; padding: 54px 20px; text-align: center; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+    .empty strong { display: block; font-size: 20px; margin-bottom: 7px; }
+    .empty span { color: var(--muted); }
+    .mobile-list { display: none; }
+    .source-note { margin: 16px 2px 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .source-note strong { color: var(--ink); }
+    @media (max-width: 1100px) {
+      .controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .field-search { grid-column: 1 / -1; }
+      .reset { justify-self: start; }
+      .table-shell { display: none; }
+      .mobile-list { display: grid; gap: 10px; }
+      .job-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; box-shadow: 0 8px 26px rgba(31,48,36,.05); }
+      .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+      .job-card h3 { margin: 5px 0 0; font-size: 17px; line-height: 1.3; }
+      .job-card .company-name { color: var(--accent-strong); font-size: 13px; }
+      .card-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0; }
+      .chip { background: var(--surface-2); color: var(--muted); border-radius: 5px; padding: 5px 7px; font-size: 11px; font-weight: 600; }
+      .chip.recent { color: var(--accent-strong); background: var(--accent-soft); }
+      .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; padding-top: 13px; border-top: 1px solid var(--line); }
+      .card-grid div { min-width: 0; }
+      .card-grid span { display: block; color: var(--muted); font-size: 11px; margin-bottom: 3px; }
+      .card-grid p { margin: 0; font-size: 13px; line-height: 1.42; overflow-wrap: anywhere; }
+      .card-grid .wide { grid-column: 1 / -1; }
+      .card-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 16px; color: var(--accent-strong); font-weight: 700; font-size: 13px; text-decoration: none; }
+      .card-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+      .card-link svg { width: 15px; height: 15px; }
+    }
+    @media (max-width: 700px) {
+      .wrap { padding: 22px 15px 36px; }
+      .intro { grid-template-columns: 1fr; gap: 20px; }
+      .intro .download { justify-self: start; }
+      h1 { font-size: clamp(36px, 12vw, 52px); }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .stat { min-height: 94px; padding: 17px; }
+      .stat:nth-child(2) { border-right: 0; }
+      .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .stat strong { font-size: 30px; }
+      .controls { grid-template-columns: 1fr; padding: 13px; }
+      .field-search { grid-column: auto; }
+      .results-bar { align-items: flex-end; }
+      .results-bar p { text-align: right; }
+      .card-grid { grid-template-columns: 1fr; }
+      .card-grid .wide { grid-column: auto; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <div class="eyebrow"><span class="pulse" aria-hidden="true"></span>Validated snapshot · Sep 29, 2026</div>
+        <h1 id="page-title">29 openings, sorted for the next move.</h1>
+        <p>US-wide roles across AI, data, infrastructure and backend engineering.</p>
+      </div>
+      <button class="download" id="downloadCsv" type="button" aria-label="Download all jobs as CSV">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>
+        Download CSV
+      </button>
+    </section>
+
+    <section class="stats" aria-label="Job statistics">
+      <div class="stat"><span>Total jobs</span><strong id="statTotal">29</strong></div>
+      <div class="stat"><span>AI / ML roles</span><strong id="statAi">16</strong></div>
+      <div class="stat"><span>Remote options</span><strong id="statRemote">12</strong></div>
+      <div class="stat"><span>Posted in 7 days</span><strong id="statRecent">13</strong></div>
+    </section>
+
+    <section class="controls" aria-label="Filter jobs">
+      <div class="field field-search">
+        <label for="search">Search jobs</label>
+        <div class="input-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="search" type="search" placeholder="Company, skill, city, note…" autocomplete="off" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="family">Role family</label>
+        <select id="family"><option value="">All families</option><option>AI / ML</option><option>Data Engineer</option><option>Forward Deployed</option><option>SRE</option><option>Backend</option></select>
+      </div>
+      <div class="field">
+        <label for="mode">Work mode</label>
+        <select id="mode"><option value="">All modes</option><option>Remote</option><option>Onsite</option><option>Hybrid</option></select>
+      </div>
+      <div class="field">
+        <label for="employment">Employment</label>
+        <select id="employment"><option value="">All types</option><option>Full-time</option><option>Contract</option><option>Internship</option></select>
+      </div>
+      <button class="reset" id="reset" type="button">Reset filters</button>
+    </section>
+
+    <div class="results-bar">
+      <h2>Open roles</h2>
+      <p id="resultCount" aria-live="polite">Showing 29 of 29</p>
+    </div>
+
+    <section class="table-shell" aria-label="Job openings">
+      <table>
+        <colgroup><col class="company"><col class="role"><col class="location"><col class="type"><col class="posted"><col class="pay"><col class="details"><col class="action"></colgroup>
+        <thead><tr><th>Company</th><th>Role</th><th>Location</th><th>Type</th><th>Posted</th><th>Pay</th><th>Experience & notes</th><th>Link</th></tr></thead>
+        <tbody id="jobRows"></tbody>
+      </table>
+    </section>
+    <section class="mobile-list" id="jobCards" aria-label="Job openings"></section>
+    <section class="empty" id="emptyState"><strong>No matching roles</strong><span>Try removing a filter or using a broader search.</span></section>
+
+    <p class="source-note"><strong>About this list:</strong> postings were validated on September 29, 2026. “Date unconfirmed” means the listing was live but its posting date was not visible. Open the source listing to confirm current availability before applying.</p>
+  </main>
+
+  <script>
+    const jobs = [
+      {company:'GM Financial',title:'Data Engineer - Adobe Exp Platform',location:'Hybrid, Irving, TX',type:'Full-time',posted:'2 hours ago',pay:'—',experience:'2-4 years hands-on data engineering',notes:'US auth required; no sponsorship',url:'https://app.joinhandshake.com/jobs/11537991?searchId=dbc09dd8-5492-420d-8875-11893be04590',family:'Data Engineer',mode:'Hybrid',employment:'Full-time',recent:true},
+      {company:'TikTok Inc.',title:'Data Engineer Graduate (Data Platform E-commerce) - 2027 Start',location:'Onsite, San Jose, CA',type:'Full-time',posted:'2 weeks ago',pay:'$128-316K/yr',experience:'New-grad cohort 2027 start',notes:'No US auth required',url:'https://app.joinhandshake.com/jobs/11401169',family:'Data Engineer',mode:'Onsite',employment:'Full-time',recent:false},
+      {company:'Texas Instruments Inc.',title:'Career Accelerator Program - Data Engineer',location:'Onsite, Richardson, TX',type:'Full-time',posted:'1 week ago',pay:'$70-110K/yr',experience:'New-college-graduate track',notes:'US auth required',url:'https://app.joinhandshake.com/jobs/11445793',family:'Data Engineer',mode:'Onsite',employment:'Full-time',recent:true},
+      {company:'TikTok Inc.',title:'Data Engineer Graduate (Monetization Data) - 2027 Start',location:'Onsite, San Jose, CA',type:'Full-time',posted:'2 weeks ago',pay:'$128-256K/yr',experience:'New-grad cohort 2027 start',notes:'No US auth required',url:'https://app.joinhandshake.com/jobs/11401214',family:'Data Engineer',mode:'Onsite',employment:'Full-time',recent:false},
+      {company:'TikTok Inc.',title:'Backend Software Engineer Graduate (Platform) - 2027 Start',location:'Onsite, New York City, NY',type:'Full-time',posted:'1 week ago',pay:'$128-256K/yr',experience:'New-grad cohort 2027 start',notes:'No US auth required',url:'https://app.joinhandshake.com/jobs/11446787',family:'Backend',mode:'Onsite',employment:'Full-time',recent:true},
+      {company:'Nike, Inc.',title:'AI & Machine Learning, Innovation, Graduate Internship',location:'Onsite, Beaverton, OR',type:'Internship (paid, summer 2027)',posted:'23 minutes ago',pay:'Paid, amount not shown',experience:"Master's student graduating Winter 2027-Summer 2028; hands-on AI/ML experience",notes:'US auth required; OPT/CPT ok',url:'https://app.joinhandshake.com/jobs/11539227',family:'AI / ML',mode:'Onsite',employment:'Internship',recent:true},
+      {company:'The Cigna Group',title:'AI/ML Engineering Intern',location:'Hybrid: Austin TX / St. Louis MO / Morris Plains NJ',type:'Internship (summer 2027)',posted:'6 hours ago',pay:'$35-43/hr',experience:"Master's/PhD student; 1+ yr hands-on ML",notes:'US authorized; no sponsorship',url:'https://app.joinhandshake.com/jobs/11536153',family:'AI / ML',mode:'Hybrid',employment:'Internship',recent:true},
+      {company:'TikTok Inc.',title:'Machine Learning MLOps Engineer Graduate (MLOps) - 2027 Start',location:'Onsite, San Jose, CA',type:'Full-time',posted:'2 weeks ago',pay:'$128-256K/yr + bonus/RSUs',experience:'New-grad cohort 2027 start',notes:'No US auth required',url:'https://app.joinhandshake.com/jobs/11415343',family:'AI / ML',mode:'Onsite',employment:'Full-time',recent:false},
+      {company:'Virtusa Corporation',title:'AI Engineer',location:'Hybrid/onsite: Piscataway NJ / Hartford CT / Dallas TX',type:'Full-time',posted:'5 days ago',pay:'$60-70K/yr + bonus',experience:'2025/2026 graduates',notes:'US authorized; no sponsorship',url:'https://app.joinhandshake.com/jobs/11498343',family:'AI / ML',mode:'Hybrid',employment:'Full-time',recent:true},
+      {company:'McKinsey & Company',title:'Data Scientist - QuantumBlack, AI by McKinsey',location:'Onsite: San Francisco CA / Dallas TX (+5)',type:'Full-time',posted:'1 hour ago',pay:'$121-125K/yr',experience:'Upcoming grad Dec 2026-Aug 2027',notes:'Sponsorship eligible; OPT/CPT ok',url:'https://app.joinhandshake.com/jobs/11538921',family:'AI / ML',mode:'Onsite',employment:'Full-time',recent:true},
+      {company:'Albano Systems Inc',title:'Generative AI Engineer',location:'Remote, EST hours',type:'Contract W2, 6 months',posted:'2026-09-25',pay:'$80-100/hr',experience:'4+ yrs SWE incl 2+ yrs LLM production (LangGraph, MCP)',notes:'W2 only; no sponsorship',url:'https://www.dice.com/job-detail/43961dc1-f3e6-4a9e-9909-1cb942ec2556',family:'AI / ML',mode:'Remote',employment:'Contract',recent:true},
+      {company:'Trunk Tools, Inc.',title:'Forward Deployed Engineer',location:'New York City HQ (flexible remote)',type:'Full-time',posted:'2026-09-24',pay:'$128.7-209K + equity',experience:'0-3 yrs SWE, early-career role',notes:'None stated',url:'https://jobs.ashbyhq.com/Trunk%20Tools/414cdb32-9e5e-4679-8736-93cc28f7cf44',family:'Forward Deployed',mode:'Remote',employment:'Full-time',recent:true},
+      {company:'Whiztek Corp',title:'Generative AI Engineer',location:'Chicago/Schaumburg IL, hybrid 3d/wk',type:'Long-term contract',posted:'2026-09-23',pay:'Depends on experience',experience:'2-3 yrs AI/ML engineering',notes:'None stated',url:'https://www.dice.com/job-detail/d242a03d-1dbc-4c94-bc7f-b3a6a0d409f4',family:'AI / ML',mode:'Hybrid',employment:'Contract',recent:true},
+      {company:'Jobot',title:'Forward Deployed Engineer',location:'San Francisco CA, onsite 5d/wk',type:'Full-time',posted:'2026-09-16',pay:'$185-300K + equity',experience:'2+ yrs professional experience',notes:'None stated',url:'https://www.dice.com/job-detail/efc0d878-9795-4e3d-b77f-1d2f3255e7f2',family:'Forward Deployed',mode:'Onsite',employment:'Full-time',recent:false},
+      {company:'Apex Systems',title:'Applied AI/ML Engineer / Data Scientist',location:'Remote (Juno Beach FL)',type:'Full-time',posted:'2026-09-15',pay:'$80-106/hr',experience:'4+ yrs ML/analytics solutions',notes:'None stated',url:'https://www.dice.com/job-detail/d3b794e3-2b13-4c0f-b430-b796fcc0852e',family:'AI / ML',mode:'Remote',employment:'Full-time',recent:false},
+      {company:'Baseten',title:'AI Engineer',location:'Hybrid, San Francisco CA',type:'Full-time',posted:'2026-09-10',pay:'Not listed',experience:'3+ yrs AI/automation engineering',notes:'None stated',url:'https://jobs.ashbyhq.com/baseten/64181d8a-960d-4aa4-8d98-3cb22b1e0616',family:'AI / ML',mode:'Hybrid',employment:'Full-time',recent:false},
+      {company:'Vitalis AI',title:'AI Engineer',location:'Remote (moving hybrid NYC/SF)',type:'Full-time',posted:'2026-09-10',pay:'$125-200K + equity',experience:'2+ yrs shipping products',notes:'None stated',url:'https://wellfound.com/jobs/4697948-ai-engineer',family:'AI / ML',mode:'Remote',employment:'Full-time',recent:false},
+      {company:'Apex Systems',title:'Generative AI Engineer',location:'Jersey City NJ, onsite',type:'Full-time',posted:'2026-09-01',pay:'$72-73/hr',experience:'3+ yrs Python OOP',notes:'None stated',url:'https://www.dice.com/job-detail/1d5b747e-ae01-49c6-aa1c-f6a31bf59287',family:'AI / ML',mode:'Onsite',employment:'Full-time',recent:false},
+      {company:'Pager Health',title:'Applied AI Engineer',location:'Remote-first',type:'Full-time',posted:'Live ~Sep 29',pay:'$150-160K',experience:'3+ yrs SWE, Python',notes:'None stated',url:'https://builtin.com/job/applied-ai-engineer/8865869',family:'AI / ML',mode:'Remote',employment:'Full-time',recent:false},
+      {company:'Mission UK & EU',title:'Applied AI Engineer',location:'Remote-first, US based',type:'Full-time',posted:'Live ~Sep 29',pay:'Not shown',experience:'3+ yrs SWE/AI/ML, 2+ yrs production AI',notes:'US authorized; no sponsorship',url:'https://builtin.com/job/applied-ai-engineer/10570506',family:'AI / ML',mode:'Remote',employment:'Full-time',recent:false},
+      {company:'Equifax Inc.',title:'Generative AI Engineer',location:'Alpharetta/Atlanta GA, onsite 4d/wk',type:'Full-time',posted:'Date unconfirmed',pay:'Not shown',experience:'2+ yrs shipping production software',notes:'No sponsorship incl STEM OPT',url:'https://builtin.com/job/generative-ai-engineer/10874874',family:'AI / ML',mode:'Onsite',employment:'Full-time',recent:false},
+      {company:'Outmarket AI',title:'Full Stack AI Engineer',location:'Remote-first / SF',type:'Full-time',posted:'Date unconfirmed',pay:'Not shown',experience:'2+ yrs ML/NLP/LLM or 3+ yrs SWE',notes:'None stated',url:'https://builtin.com/job/full-stack-ai-engineer/10641851',family:'AI / ML',mode:'Remote',employment:'Full-time',recent:false},
+      {company:'Kalibri Labs',title:'Machine Learning Engineer',location:'Fully remote',type:'Full-time',posted:'Date unconfirmed',pay:'$115-138K',experience:'3+ yrs building ML systems',notes:'None stated',url:'https://builtin.com/job/machine-learning-engineer/7160540',family:'AI / ML',mode:'Remote',employment:'Full-time',recent:false},
+      {company:'Upstart',title:'Software Engineer, Site Reliability',location:'Remote US',type:'Not listed',posted:'2026-09-22',pay:'$142-196.6K + bonus/equity',experience:'3+ yrs SWE/SRE',notes:'None stated',url:'https://job-boards.greenhouse.io/upstart/jobs/8223417',family:'SRE',mode:'Remote',employment:'',recent:true},
+      {company:'HonorVet Technologies',title:'Site Reliability Engineer',location:'San Francisco CA, onsite',type:'Contract',posted:'2026-09-25',pay:'Not shown',experience:'3+ yrs SRE, 2+ yrs AWS',notes:'None stated',url:'https://www.dice.com/job-detail/3005ecfd-8033-4e69-a0d7-8625806455aa',family:'SRE',mode:'Onsite',employment:'Contract',recent:true},
+      {company:'SpaceX',title:'Software Engineer, Backend (Python/C++)',location:'Hawthorne CA, onsite',type:'Full-time',posted:'2026-09-26',pay:'$125-150K (Level I)',experience:"Bachelor's or 2+ yrs; 1+ yr C/C++, 1+ yr Python",notes:'CAVEAT: ITAR, US person required',url:'https://www.dice.com/job-detail/ff27c9e6-d658-430b-be11-5054420dbbc0',family:'Backend',mode:'Onsite',employment:'Full-time',recent:true},
+      {company:'HomeVision',title:'Site Reliability Engineer - US - Remote',location:'US remote',type:'Full-time',posted:'Date unconfirmed',pay:'Not shown',experience:'2+ yrs SRE/cloud ops (AWS)',notes:'No visa sponsorship',url:'https://builtin.com/job/site-reliability-engineer-us-remote/7132666',family:'SRE',mode:'Remote',employment:'Full-time',recent:false},
+      {company:'Mindex',title:'Data Engineer - Remote',location:'Fully remote',type:'Full-time',posted:'Date unconfirmed',pay:'$90-140K',experience:'3+ yrs advanced SQL',notes:'No sponsorship',url:'https://Builtin.com/job/data-engineer-remote/9546420',family:'Data Engineer',mode:'Remote',employment:'Full-time',recent:false},
+      {company:'Sayari',title:'Data Engineer (Remote, US)',location:'Remote US',type:'Full-time',posted:'Date unconfirmed',pay:'$90-120K',experience:'3+ yrs data engineering',notes:'CAVEAT: gov customers; no clearance req',url:'https://Builtin.com/job/data-engineer-remote-us/9509691',family:'Data Engineer',mode:'Remote',employment:'Full-time',recent:false}
+    ];
+
+    const rowHost = document.getElementById('jobRows');
+    const cardHost = document.getElementById('jobCards');
+    const empty = document.getElementById('emptyState');
+    const resultCount = document.getElementById('resultCount');
+    const controls = { search: document.getElementById('search'), family: document.getElementById('family'), mode: document.getElementById('mode'), employment: document.getElementById('employment') };
+    const externalIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 5h5v5M19 5l-9 9"/><path d="M19 13v6H5V5h6"/></svg>';
+    const escapeHtml = value => String(value).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+
+    function matches(job) {
+      const q = controls.search.value.trim().toLowerCase();
+      const haystack = [job.company,job.title,job.location,job.type,job.posted,job.pay,job.experience,job.notes,job.family,job.mode].join(' ').toLowerCase();
+      return (!q || haystack.includes(q)) && (!controls.family.value || job.family === controls.family.value) && (!controls.mode.value || job.mode === controls.mode.value) && (!controls.employment.value || job.employment === controls.employment.value);
+    }
+
+    function render() {
+      const filtered = jobs.filter(matches);
+      rowHost.innerHTML = filtered.map(job => `
+        <tr>
+          <td><div class="company-name">${escapeHtml(job.company)}</div></td>
+          <td><div class="role-title">${escapeHtml(job.title)}</div><span class="family">${escapeHtml(job.family)}</span></td>
+          <td class="location-text">${escapeHtml(job.location)}</td>
+          <td><span class="type-badge">${escapeHtml(job.type)}</span></td>
+          <td class="${job.recent ? 'posted-recent' : 'meta'}">${escapeHtml(job.posted)}</td>
+          <td class="pay">${escapeHtml(job.pay)}</td>
+          <td><div>${escapeHtml(job.experience)}</div><div class="notes">${escapeHtml(job.notes)}</div></td>
+          <td><a class="apply" href="${escapeHtml(job.url)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escapeHtml(job.title)} at ${escapeHtml(job.company)}">${externalIcon}</a></td>
+        </tr>`).join('');
+      cardHost.innerHTML = filtered.map(job => `
+        <article class="job-card">
+          <div class="card-top"><div><div class="company-name">${escapeHtml(job.company)}</div><h3>${escapeHtml(job.title)}</h3></div><span class="family">${escapeHtml(job.family)}</span></div>
+          <div class="card-chips"><span class="chip">${escapeHtml(job.mode)}</span><span class="chip">${escapeHtml(job.type)}</span><span class="chip ${job.recent ? 'recent' : ''}">${escapeHtml(job.posted)}</span></div>
+          <div class="card-grid"><div><span>Location</span><p>${escapeHtml(job.location)}</p></div><div><span>Pay</span><p class="pay">${escapeHtml(job.pay)}</p></div><div class="wide"><span>Experience</span><p>${escapeHtml(job.experience)}</p></div><div class="wide"><span>Notes</span><p>${escapeHtml(job.notes)}</p></div></div>
+          <a class="card-link" href="${escapeHtml(job.url)}" target="_blank" rel="noopener noreferrer">View posting ${externalIcon}</a>
+        </article>`).join('');
+      resultCount.textContent = `Showing ${filtered.length} of ${jobs.length}`;
+      empty.style.display = filtered.length ? 'none' : 'block';
+      document.querySelector('.table-shell').style.display = filtered.length ? '' : 'none';
+      cardHost.style.display = filtered.length ? '' : 'none';
+    }
+
+    Object.values(controls).forEach(control => control.addEventListener(control.tagName === 'INPUT' ? 'input' : 'change', render));
+    document.getElementById('reset').addEventListener('click', () => { Object.values(controls).forEach(control => control.value = ''); render(); controls.search.focus(); });
+    document.getElementById('downloadCsv').addEventListener('click', () => {
+      const cols = ['Company','Title','Location','Type','Posted','Pay','Experience','Notes','Link'];
+      const quote = value => `"${String(value).replace(/"/g, '""')}"`;
+      const csv = [cols, ...jobs.map(j => [j.company,j.title,j.location,j.type,j.posted,j.pay,j.experience,j.notes,j.url])].map(row => row.map(quote).join(',')).join('\r\n');
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob); link.download = 'validated-jobs-2026-09-29.csv';
+      document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(link.href);
+    });
+    render();
+  </script>
+</body>
+</html>
