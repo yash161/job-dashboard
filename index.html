@@ -138,10 +138,10 @@
     .results-bar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 25px 2px 12px; }
     .results-bar h2 { margin: 0; font-size: 19px; letter-spacing: -.015em; }
     .results-bar p { margin: 0; color: var(--muted); font-size: 13px; }
-    .table-shell { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--surface); box-shadow: var(--shadow); }
-    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    col.company { width: 12%; } col.role { width: 21%; } col.location { width: 13%; } col.type { width: 9%; }
-    col.posted { width: 8%; } col.pay { width: 10%; } col.details { width: 20%; } col.action { width: 7%; }
+    .table-shell { border: 1px solid var(--line); border-radius: 14px; overflow-x: auto; background: var(--surface); box-shadow: var(--shadow); -webkit-overflow-scrolling: touch; }
+    table { width: 100%; min-width: 980px; border-collapse: collapse; }
+    col.company { width: 12%; } col.role { width: 22%; } col.location { width: 13%; } col.type { width: 9%; }
+    col.posted { width: 8%; } col.pay { width: 10%; } col.details { width: 16%; } col.src-col { width: 10%; } col.action { width: 92px; }
     thead th {
       padding: 14px 12px; text-align: left; color: var(--muted); background: var(--surface-2);
       border-bottom: 1px solid var(--line); font: 600 11px/1.2 "IBM Plex Mono", monospace; letter-spacing: .03em; text-transform: uppercase;
@@ -158,12 +158,28 @@
     .pay { font-weight: 700; }
     .notes { margin-top: 7px; color: var(--muted); }
     .notes::before { content: "Note: "; font-weight: 600; }
-    .apply {
-      display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px;
-      border: 1px solid var(--line); border-radius: 7px; color: var(--accent-strong); background: var(--surface); text-decoration: none;
+    .role-title-link {
+      font-weight: 600; font-size: 14px; line-height: 1.35; color: var(--ink);
+      text-decoration: none; transition: color .15s ease;
     }
-    .apply:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-    .apply svg { width: 16px; height: 16px; }
+    .role-title-link:hover {
+      color: var(--accent); text-decoration: underline; text-underline-offset: 3px;
+    }
+    .job-card h3 .role-title-link { font-size: 17px; }
+    .src-link { text-decoration: none; display: inline-block; }
+    .src-link:hover .src-badge { opacity: 0.85; filter: brightness(1.1); }
+    .apply {
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+      padding: 6px 12px; min-height: 32px; border: 1px solid var(--accent);
+      border-radius: 7px; color: #fff; background: var(--accent);
+      font: 600 12px/1 "IBM Plex Sans", sans-serif; text-decoration: none;
+      white-space: nowrap; transition: all .15s ease;
+    }
+    .apply:hover {
+      background: var(--accent-strong); border-color: var(--accent-strong); color: #111512;
+      box-shadow: 0 2px 8px rgba(97, 211, 155, .3);
+    }
+    .apply svg { width: 12px; height: 12px; stroke-width: 2.5; }
     .empty { display: none; padding: 54px 20px; text-align: center; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
     .empty strong { display: block; font-size: 20px; margin-bottom: 7px; }
     .empty span { color: var(--muted); }
@@ -274,7 +290,7 @@
     <section class="table-shell" id="tableShell" aria-label="Job openings">
       <table>
         <colgroup><col class="company"><col class="role"><col class="location"><col class="type"><col class="posted"><col class="pay"><col class="details"><col class="src-col" style="width:8%"><col class="action"></colgroup>
-        <thead><tr><th>Company</th><th>Role</th><th>Location</th><th>Type</th><th>Posted</th><th>Pay</th><th>Experience & notes</th><th class="src-col">Source</th><th>Link</th></tr></thead>
+        <thead><tr><th>Company</th><th>Role</th><th>Location</th><th>Type</th><th>Posted</th><th>Pay</th><th>Experience & notes</th><th class="src-col">Source</th><th>Apply</th></tr></thead>
         <tbody id="jobRows"></tbody>
       </table>
     </section>
@@ -399,18 +415,29 @@
       rowHost.innerHTML = filtered.map(job => `
         <tr>
           <td><div class="company-name">${escapeHtml(job.company)}</div></td>
-          <td><div class="role-title">${escapeHtml(job.title)}</div><span class="family">${escapeHtml(job.family)}</span></td>
+          <td>
+            ${job.url ? `<a class="role-title-link" href="${escapeHtml(job.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(job.title)}</a>` : `<div class="role-title">${escapeHtml(job.title)}</div>`}
+            <div><span class="family">${escapeHtml(job.family)}</span></div>
+          </td>
           <td class="location-text">${escapeHtml(job.location)}</td>
           <td><span class="type-badge">${escapeHtml(job.type)}</span></td>
           <td class="${job.recent ? 'posted-recent' : 'meta'}">${escapeHtml(job.posted)}</td>
           <td class="pay">${escapeHtml(job.pay)}</td>
           <td><div>${escapeHtml(job.experience)}</div><div class="notes">${escapeHtml(job.notes)}</div></td>
-          <td class="src-col">${sourceBadge(job.source)}</td>
-          <td><a class="apply" href="${escapeHtml(job.url)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escapeHtml(job.title)} at ${escapeHtml(job.company)}">${externalIcon}</a></td>
+          <td class="src-col">${job.url && job.source ? `<a class="src-link" href="${escapeHtml(job.url)}" target="_blank" rel="noopener noreferrer" title="Open on ${escapeHtml(job.source)}">${sourceBadge(job.source)}</a>` : sourceBadge(job.source)}</td>
+          <td>
+            ${job.url ? `<a class="apply" href="${escapeHtml(job.url)}" target="_blank" rel="noopener noreferrer" aria-label="Apply to ${escapeHtml(job.title)} at ${escapeHtml(job.company)}"><span>Apply</span> ${externalIcon}</a>` : '<span class="meta">—</span>'}
+          </td>
         </tr>`).join('');
       cardHost.innerHTML = filtered.map(job => `
         <article class="job-card">
-          <div class="card-top"><div><div class="company-name">${escapeHtml(job.company)}</div><h3>${escapeHtml(job.title)}</h3></div><span class="family">${escapeHtml(job.family)}</span></div>
+          <div class="card-top">
+            <div>
+              <div class="company-name">${escapeHtml(job.company)}</div>
+              <h3>${job.url ? `<a class="role-title-link" href="${escapeHtml(job.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(job.title)}</a>` : escapeHtml(job.title)}</h3>
+            </div>
+            <span class="family">${escapeHtml(job.family)}</span>
+          </div>
           <div class="card-chips"><span class="chip">${escapeHtml(job.mode)}</span><span class="chip">${escapeHtml(job.type)}</span><span class="chip ${job.recent ? 'recent' : ''}">${escapeHtml(job.posted)}</span>${job.source ? sourceBadge(job.source) : ''}</div>
           <div class="card-grid"><div><span>Location</span><p>${escapeHtml(job.location)}</p></div><div><span>Pay</span><p class="pay">${escapeHtml(job.pay)}</p></div><div class="wide"><span>Experience</span><p>${escapeHtml(job.experience)}</p></div><div class="wide"><span>Notes</span><p>${escapeHtml(job.notes)}</p></div></div>
           <a class="card-link" href="${escapeHtml(job.url)}" target="_blank" rel="noopener noreferrer">View posting ${externalIcon}</a>
