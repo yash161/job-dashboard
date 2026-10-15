@@ -140,8 +140,8 @@
     .results-bar p { margin: 0; color: var(--muted); font-size: 13px; }
     .table-shell { border: 1px solid var(--line); border-radius: 14px; overflow-x: auto; background: var(--surface); box-shadow: var(--shadow); -webkit-overflow-scrolling: touch; }
     table { width: 100%; min-width: 980px; border-collapse: collapse; }
-    col.company { width: 12%; } col.role { width: 22%; } col.location { width: 13%; } col.type { width: 9%; }
-    col.posted { width: 8%; } col.pay { width: 10%; } col.details { width: 16%; } col.src-col { width: 10%; } col.action { width: 92px; }
+    col.company { width: 12%; } col.role { width: 22%; } col.location { width: 12%; } col.type { width: 8%; }
+    col.posted { width: 7%; } col.pay { width: 9%; } col.details { width: 14%; } col.src-col { width: 8%; } col.action { width: 8%; min-width: 72px; }
     thead th {
       padding: 14px 12px; text-align: left; color: var(--muted); background: var(--surface-2);
       border-bottom: 1px solid var(--line); font: 600 11px/1.2 "IBM Plex Mono", monospace; letter-spacing: .03em; text-transform: uppercase;
@@ -160,10 +160,11 @@
     .notes::before { content: "Note: "; font-weight: 600; }
     .role-title-link {
       font-weight: 600; font-size: 14px; line-height: 1.35; color: var(--ink);
-      text-decoration: none; transition: color .15s ease;
+      text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px;
+      transition: all .15s ease;
     }
     .role-title-link:hover {
-      color: var(--accent); text-decoration: underline; text-underline-offset: 3px;
+      color: var(--accent); text-decoration-color: var(--accent);
     }
     .job-card h3 .role-title-link { font-size: 17px; }
     .src-link { text-decoration: none; display: inline-block; }
@@ -289,7 +290,7 @@
 
     <section class="table-shell" id="tableShell" aria-label="Job openings">
       <table>
-        <colgroup><col class="company"><col class="role"><col class="location"><col class="type"><col class="posted"><col class="pay"><col class="details"><col class="src-col" style="width:8%"><col class="action"></colgroup>
+        <colgroup><col class="company"><col class="role"><col class="location"><col class="type"><col class="posted"><col class="pay"><col class="details"><col class="src-col"><col class="action"></colgroup>
         <thead><tr><th>Company</th><th>Role</th><th>Location</th><th>Type</th><th>Posted</th><th>Pay</th><th>Experience & notes</th><th class="src-col">Source</th><th>Apply</th></tr></thead>
         <tbody id="jobRows"></tbody>
       </table>
