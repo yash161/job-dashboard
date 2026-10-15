@@ -139,14 +139,14 @@
     .results-bar h2 { margin: 0; font-size: 19px; letter-spacing: -.015em; }
     .results-bar p { margin: 0; color: var(--muted); font-size: 13px; }
     .table-shell { border: 1px solid var(--line); border-radius: 14px; overflow-x: auto; background: var(--surface); box-shadow: var(--shadow); -webkit-overflow-scrolling: touch; }
-    table { width: 100%; min-width: 980px; border-collapse: collapse; }
-    col.company { width: 12%; } col.role { width: 22%; } col.location { width: 12%; } col.type { width: 8%; }
-    col.posted { width: 7%; } col.pay { width: 9%; } col.details { width: 14%; } col.src-col { width: 8%; } col.action { width: 8%; min-width: 72px; }
+    table { width: 100%; border-collapse: collapse; }
+    col.company { width: 12%; } col.role { width: 23%; } col.location { width: 12%; } col.type { width: 8%; }
+    col.posted { width: 7%; } col.pay { width: 9%; } col.details { width: 13%; } col.src-col { width: 9%; } col.action { width: 7%; }
     thead th {
-      padding: 14px 12px; text-align: left; color: var(--muted); background: var(--surface-2);
+      padding: 12px 8px; text-align: left; color: var(--muted); background: var(--surface-2);
       border-bottom: 1px solid var(--line); font: 600 11px/1.2 "IBM Plex Mono", monospace; letter-spacing: .03em; text-transform: uppercase;
     }
-    tbody td { padding: 17px 12px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 13px; line-height: 1.43; overflow-wrap: anywhere; }
+    tbody td { padding: 13px 8px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 13px; line-height: 1.43; overflow-wrap: anywhere; }
     tbody tr:last-child td { border-bottom: 0; }
     tbody tr:hover { background: color-mix(in srgb, var(--accent-soft) 35%, var(--surface)); }
     .company-name { font-weight: 700; line-height: 1.25; }
@@ -160,27 +160,27 @@
     .notes::before { content: "Note: "; font-weight: 600; }
     .role-title-link {
       font-weight: 600; font-size: 14px; line-height: 1.35; color: var(--ink);
-      text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px;
+      text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px;
       transition: all .15s ease;
     }
     .role-title-link:hover {
-      color: var(--accent); text-decoration-color: var(--accent);
+      color: var(--accent-strong); text-decoration-color: var(--accent-strong);
     }
     .job-card h3 .role-title-link { font-size: 17px; }
-    .src-link { text-decoration: none; display: inline-block; }
+    .src-link { text-decoration: none; display: inline-flex; align-items: center; gap: 3px; }
     .src-link:hover .src-badge { opacity: 0.85; filter: brightness(1.1); }
     .apply {
-      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
-      padding: 6px 12px; min-height: 32px; border: 1px solid var(--accent);
-      border-radius: 7px; color: #fff; background: var(--accent);
-      font: 600 12px/1 "IBM Plex Sans", sans-serif; text-decoration: none;
+      display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+      padding: 5px 8px; min-height: 28px; border: 1px solid var(--accent);
+      border-radius: 6px; color: #fff; background: var(--accent);
+      font: 600 11px/1 "IBM Plex Sans", sans-serif; text-decoration: none;
       white-space: nowrap; transition: all .15s ease;
     }
     .apply:hover {
       background: var(--accent-strong); border-color: var(--accent-strong); color: #111512;
       box-shadow: 0 2px 8px rgba(97, 211, 155, .3);
     }
-    .apply svg { width: 12px; height: 12px; stroke-width: 2.5; }
+    .apply svg { width: 11px; height: 11px; stroke-width: 2.5; }
     .empty { display: none; padding: 54px 20px; text-align: center; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
     .empty strong { display: block; font-size: 20px; margin-bottom: 7px; }
     .empty span { color: var(--muted); }
