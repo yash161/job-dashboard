@@ -8,10 +8,19 @@ roles across AI/ML, Forward Deployed, SRE, Backend, and Data Engineering.
 Open `index.html` in a browser, or enable GitHub Pages on this repo
 (Settings → Pages → Deploy from branch → main) for a live link.
 
+## Claude tab
+
+The **Claude** tab lists 269 openings found on Oct 15, 2026: 172 from LinkedIn
+(last 24 hours, Apify scrape) and 97 from Indeed (Indeed connector). Every row shows its
+source. Defense, clearance and ITAR roles were removed by title and employer; job
+descriptions were not read in full. Data lives in `claude-jobs.js`; open
+`index.html#claude` to land on the tab.
+
 ## Files
 
 - `index.html` — the dashboard: instant search, filters (role family, work mode,
   employment type), summary counts, CSV download, direct job links.
+- `claude-jobs.js` — data for the Claude tab (loaded by `index.html`).
 - `jobs.json` — the same 29 jobs as machine-readable data
   (id, title, company, location, pay, type, experience, source, posted,
   apply_by, url, work_auth).

@@ -104,6 +104,18 @@
     .stat:nth-child(2) strong { color: var(--accent); }
     .stat:nth-child(3) strong { color: var(--blue); }
     .stat:nth-child(4) strong { color: var(--amber); }
+    .tabs { display: flex; gap: 8px; margin: 0 0 18px; }
+    .tab { min-height: 43px; padding: 9px 18px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); font: 600 14px "IBM Plex Sans", sans-serif; cursor: pointer; }
+    .tab:hover { color: var(--ink); }
+    .tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .tab .count { margin-left: 6px; font-family: "IBM Plex Mono", monospace; font-size: 12px; opacity: .85; }
+    .src-badge { display: inline-block; padding: 4px 7px; border-radius: 5px; font-weight: 600; font-size: 11px; background: var(--amber-soft); color: var(--amber); }
+    .src-badge.linkedin { background: var(--blue-soft); color: var(--blue); }
+    .src-badge.indeed { background: var(--accent-soft); color: var(--accent-strong); }
+    .src-col, .field-source { display: none; }
+    .show-source .src-col { display: table-cell; }
+    .controls.show-source .field-source { display: block; }
+    .controls.show-source { grid-template-columns: minmax(260px, 1.4fr) repeat(4, minmax(130px, .6fr)) auto; }
     .controls {
       margin-top: 22px; display: grid; grid-template-columns: minmax(280px, 1.5fr) repeat(3, minmax(150px, .65fr)) auto;
       gap: 10px; align-items: end; padding: 15px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
@@ -155,7 +167,7 @@
     .source-note { margin: 16px 2px 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
     .source-note strong { color: var(--ink); }
     @media (max-width: 1100px) {
-      .controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .controls, .controls.show-source { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .field-search { grid-column: 1 / -1; }
       .reset { justify-self: start; }
       .table-shell { display: none; }
@@ -198,11 +210,15 @@
 </head>
 <body>
   <main class="wrap">
+    <div class="tabs" role="tablist" aria-label="Job lists">
+      <button class="tab" role="tab" id="tabValidated" aria-selected="true" type="button">Validated<span class="count">29</span></button>
+      <button class="tab" role="tab" id="tabClaude" aria-selected="false" type="button">Claude<span class="count" id="claudeCount">0</span></button>
+    </div>
     <section class="intro" aria-labelledby="page-title">
       <div>
-        <div class="eyebrow"><span class="pulse" aria-hidden="true"></span>Validated snapshot · Sep 29, 2026</div>
+        <div class="eyebrow"><span class="pulse" aria-hidden="true"></span><span id="eyebrowText">Validated snapshot · Sep 29, 2026</span></div>
         <h1 id="page-title">29 openings, sorted for the next move.</h1>
-        <p>US-wide roles across AI, data, infrastructure and backend engineering.</p>
+        <p id="introText">US-wide roles across AI, data, infrastructure and backend engineering.</p>
       </div>
       <button class="download" id="downloadCsv" type="button" aria-label="Download all jobs as CSV">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg>
@@ -211,13 +227,13 @@
     </section>
 
     <section class="stats" aria-label="Job statistics">
-      <div class="stat"><span>Total jobs</span><strong id="statTotal">29</strong></div>
-      <div class="stat"><span>AI / ML roles</span><strong id="statAi">16</strong></div>
-      <div class="stat"><span>Remote options</span><strong id="statRemote">12</strong></div>
-      <div class="stat"><span>Posted in 7 days</span><strong id="statRecent">13</strong></div>
+      <div class="stat"><span id="lbl1">Total jobs</span><strong id="statTotal">29</strong></div>
+      <div class="stat"><span id="lbl2">AI / ML roles</span><strong id="statAi">16</strong></div>
+      <div class="stat"><span id="lbl3">Remote options</span><strong id="statRemote">12</strong></div>
+      <div class="stat"><span id="lbl4">Posted in 7 days</span><strong id="statRecent">13</strong></div>
     </section>
 
-    <section class="controls" aria-label="Filter jobs">
+    <section class="controls" id="controls" aria-label="Filter jobs">
       <div class="field field-search">
         <label for="search">Search jobs</label>
         <div class="input-wrap">
@@ -227,7 +243,11 @@
       </div>
       <div class="field">
         <label for="family">Role family</label>
-        <select id="family"><option value="">All families</option><option>AI / ML</option><option>Data Engineer</option><option>Forward Deployed</option><option>SRE</option><option>Backend</option></select>
+        <select id="family"></select>
+      </div>
+      <div class="field field-source">
+        <label for="source">Source</label>
+        <select id="source"><option value="">All sources</option><option>LinkedIn</option><option>Indeed</option></select>
       </div>
       <div class="field">
         <label for="mode">Work mode</label>
@@ -241,25 +261,26 @@
     </section>
 
     <div class="results-bar">
-      <h2>Open roles</h2>
+      <h2 id="listTitle">Open roles</h2>
       <p id="resultCount" aria-live="polite">Showing 29 of 29</p>
     </div>
 
-    <section class="table-shell" aria-label="Job openings">
+    <section class="table-shell" id="tableShell" aria-label="Job openings">
       <table>
-        <colgroup><col class="company"><col class="role"><col class="location"><col class="type"><col class="posted"><col class="pay"><col class="details"><col class="action"></colgroup>
-        <thead><tr><th>Company</th><th>Role</th><th>Location</th><th>Type</th><th>Posted</th><th>Pay</th><th>Experience & notes</th><th>Link</th></tr></thead>
+        <colgroup><col class="company"><col class="role"><col class="location"><col class="type"><col class="posted"><col class="pay"><col class="details"><col class="src-col" style="width:8%"><col class="action"></colgroup>
+        <thead><tr><th>Company</th><th>Role</th><th>Location</th><th>Type</th><th>Posted</th><th>Pay</th><th>Experience & notes</th><th class="src-col">Source</th><th>Link</th></tr></thead>
         <tbody id="jobRows"></tbody>
       </table>
     </section>
     <section class="mobile-list" id="jobCards" aria-label="Job openings"></section>
     <section class="empty" id="emptyState"><strong>No matching roles</strong><span>Try removing a filter or using a broader search.</span></section>
 
-    <p class="source-note"><strong>About this list:</strong> postings were validated on September 29, 2026. “Date unconfirmed” means the listing was live but its posting date was not visible. Open the source listing to confirm current availability before applying.</p>
+    <p class="source-note" id="sourceNote"><strong>About this list:</strong> postings were validated on September 29, 2026. “Date unconfirmed” means the listing was live but its posting date was not visible. Open the source listing to confirm current availability before applying.</p>
   </main>
 
+  <script src="claude-jobs.js"></script>
   <script>
-    const jobs = [
+    const validatedJobs = [
       {company:'GM Financial',title:'Data Engineer - Adobe Exp Platform',location:'Hybrid, Irving, TX',type:'Full-time',posted:'2 hours ago',pay:'—',experience:'2-4 years hands-on data engineering',notes:'US auth required; no sponsorship',url:'https://app.joinhandshake.com/jobs/11537991?searchId=dbc09dd8-5492-420d-8875-11893be04590',family:'Data Engineer',mode:'Hybrid',employment:'Full-time',recent:true},
       {company:'TikTok Inc.',title:'Data Engineer Graduate (Data Platform E-commerce) - 2027 Start',location:'Onsite, San Jose, CA',type:'Full-time',posted:'2 weeks ago',pay:'$128-316K/yr',experience:'New-grad cohort 2027 start',notes:'No US auth required',url:'https://app.joinhandshake.com/jobs/11401169',family:'Data Engineer',mode:'Onsite',employment:'Full-time',recent:false},
       {company:'Texas Instruments Inc.',title:'Career Accelerator Program - Data Engineer',location:'Onsite, Richardson, TX',type:'Full-time',posted:'1 week ago',pay:'$70-110K/yr',experience:'New-college-graduate track',notes:'US auth required',url:'https://app.joinhandshake.com/jobs/11445793',family:'Data Engineer',mode:'Onsite',employment:'Full-time',recent:true},
@@ -290,19 +311,77 @@
       {company:'Mindex',title:'Data Engineer - Remote',location:'Fully remote',type:'Full-time',posted:'Date unconfirmed',pay:'$90-140K',experience:'3+ yrs advanced SQL',notes:'No sponsorship',url:'https://Builtin.com/job/data-engineer-remote/9546420',family:'Data Engineer',mode:'Remote',employment:'Full-time',recent:false},
       {company:'Sayari',title:'Data Engineer (Remote, US)',location:'Remote US',type:'Full-time',posted:'Date unconfirmed',pay:'$90-120K',experience:'3+ yrs data engineering',notes:'CAVEAT: gov customers; no clearance req',url:'https://Builtin.com/job/data-engineer-remote-us/9509691',family:'Data Engineer',mode:'Remote',employment:'Full-time',recent:false}
     ];
+    validatedJobs.forEach(j => { j.source = j.source || ''; });
+    const claudeJobs = window.claudeJobs || [];
+    const VALIDATED_FAMILIES = ['AI / ML','Data Engineer','Forward Deployed','SRE','Backend'];
+    const CLAUDE_FAMILIES = ['DevOps','SRE','Cloud / Platform','Data / ML','Backend / Software'];
+    const validatedNote = document.getElementById('sourceNote').innerHTML;
+    let jobs = validatedJobs;
+    let activeTab = 'validated';
 
     const rowHost = document.getElementById('jobRows');
     const cardHost = document.getElementById('jobCards');
     const empty = document.getElementById('emptyState');
     const resultCount = document.getElementById('resultCount');
-    const controls = { search: document.getElementById('search'), family: document.getElementById('family'), mode: document.getElementById('mode'), employment: document.getElementById('employment') };
+    const controls = { search: document.getElementById('search'), family: document.getElementById('family'), mode: document.getElementById('mode'), employment: document.getElementById('employment'), source: document.getElementById('source') };
     const externalIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 5h5v5M19 5l-9 9"/><path d="M19 13v6H5V5h6"/></svg>';
     const escapeHtml = value => String(value).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 
+    function sourceBadge(src) {
+      return src ? `<span class="src-badge ${escapeHtml(src.toLowerCase())}">${escapeHtml(src)}</span>` : '';
+    }
+
+    function setFamilies(list) {
+      controls.family.innerHTML = '<option value="">All families</option>' + list.map(f => `<option>${escapeHtml(f)}</option>`).join('');
+    }
+
+    function setTab(tab) {
+      activeTab = tab;
+      const isClaude = tab === 'claude';
+      jobs = isClaude ? claudeJobs : validatedJobs;
+      document.getElementById('tabValidated').setAttribute('aria-selected', String(!isClaude));
+      document.getElementById('tabClaude').setAttribute('aria-selected', String(isClaude));
+      document.getElementById('controls').classList.toggle('show-source', isClaude);
+      document.getElementById('tableShell').classList.toggle('show-source', isClaude);
+      Object.values(controls).forEach(c => c.value = '');
+      setFamilies(isClaude ? CLAUDE_FAMILIES : VALIDATED_FAMILIES);
+      const by = name => jobs.filter(j => j.source === name).length;
+      if (isClaude) {
+        document.getElementById('eyebrowText').textContent = 'Found by Claude · Oct 15, 2026';
+        document.getElementById('page-title').textContent = `${jobs.length} openings from LinkedIn and Indeed.`;
+        document.getElementById('introText').textContent = 'US-wide DevOps, cloud, SRE, backend and data roles at startups, mid-size and large companies. Defense, clearance and ITAR roles are removed.';
+        document.getElementById('lbl1').textContent = 'Total jobs';
+        document.getElementById('lbl2').textContent = 'From LinkedIn';
+        document.getElementById('lbl3').textContent = 'From Indeed';
+        document.getElementById('lbl4').textContent = 'Posted in 7 days';
+        document.getElementById('statTotal').textContent = jobs.length;
+        document.getElementById('statAi').textContent = by('LinkedIn');
+        document.getElementById('statRemote').textContent = by('Indeed');
+        document.getElementById('statRecent').textContent = jobs.filter(j => j.recent).length;
+        document.getElementById('listTitle').textContent = 'Claude finds';
+        document.getElementById('sourceNote').innerHTML = '<strong>About this list:</strong> LinkedIn postings are from the last 24 hours (Apify scrape, Oct 15, 2026). Indeed postings come from the Indeed connector and date from Aug to Oct 2026. Titles and employers were screened for clearance and export-control roles, but job descriptions were not read in full, so check the requirements before applying.';
+      } else {
+        document.getElementById('eyebrowText').textContent = 'Validated snapshot · Sep 29, 2026';
+        document.getElementById('page-title').textContent = '29 openings, sorted for the next move.';
+        document.getElementById('introText').textContent = 'US-wide roles across AI, data, infrastructure and backend engineering.';
+        document.getElementById('lbl1').textContent = 'Total jobs';
+        document.getElementById('lbl2').textContent = 'AI / ML roles';
+        document.getElementById('lbl3').textContent = 'Remote options';
+        document.getElementById('lbl4').textContent = 'Posted in 7 days';
+        document.getElementById('statTotal').textContent = '29';
+        document.getElementById('statAi').textContent = '16';
+        document.getElementById('statRemote').textContent = '12';
+        document.getElementById('statRecent').textContent = '13';
+        document.getElementById('listTitle').textContent = 'Open roles';
+        document.getElementById('sourceNote').innerHTML = validatedNote;
+      }
+      render();
+    }
+
     function matches(job) {
       const q = controls.search.value.trim().toLowerCase();
-      const haystack = [job.company,job.title,job.location,job.type,job.posted,job.pay,job.experience,job.notes,job.family,job.mode].join(' ').toLowerCase();
-      return (!q || haystack.includes(q)) && (!controls.family.value || job.family === controls.family.value) && (!controls.mode.value || job.mode === controls.mode.value) && (!controls.employment.value || job.employment === controls.employment.value);
+      const haystack = [job.company,job.title,job.location,job.type,job.posted,job.pay,job.experience,job.notes,job.family,job.mode,job.source].join(' ').toLowerCase();
+      return (!q || haystack.includes(q)) && (!controls.family.value || job.family === controls.family.value) && (!controls.mode.value || job.mode === controls.mode.value) && (!controls.employment.value || job.employment === controls.employment.value) && (!controls.source.value || job.source === controls.source.value);
     }
 
     function render() {
@@ -316,12 +395,13 @@
           <td class="${job.recent ? 'posted-recent' : 'meta'}">${escapeHtml(job.posted)}</td>
           <td class="pay">${escapeHtml(job.pay)}</td>
           <td><div>${escapeHtml(job.experience)}</div><div class="notes">${escapeHtml(job.notes)}</div></td>
+          <td class="src-col">${sourceBadge(job.source)}</td>
           <td><a class="apply" href="${escapeHtml(job.url)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escapeHtml(job.title)} at ${escapeHtml(job.company)}">${externalIcon}</a></td>
         </tr>`).join('');
       cardHost.innerHTML = filtered.map(job => `
         <article class="job-card">
           <div class="card-top"><div><div class="company-name">${escapeHtml(job.company)}</div><h3>${escapeHtml(job.title)}</h3></div><span class="family">${escapeHtml(job.family)}</span></div>
-          <div class="card-chips"><span class="chip">${escapeHtml(job.mode)}</span><span class="chip">${escapeHtml(job.type)}</span><span class="chip ${job.recent ? 'recent' : ''}">${escapeHtml(job.posted)}</span></div>
+          <div class="card-chips"><span class="chip">${escapeHtml(job.mode)}</span><span class="chip">${escapeHtml(job.type)}</span><span class="chip ${job.recent ? 'recent' : ''}">${escapeHtml(job.posted)}</span>${job.source ? sourceBadge(job.source) : ''}</div>
           <div class="card-grid"><div><span>Location</span><p>${escapeHtml(job.location)}</p></div><div><span>Pay</span><p class="pay">${escapeHtml(job.pay)}</p></div><div class="wide"><span>Experience</span><p>${escapeHtml(job.experience)}</p></div><div class="wide"><span>Notes</span><p>${escapeHtml(job.notes)}</p></div></div>
           <a class="card-link" href="${escapeHtml(job.url)}" target="_blank" rel="noopener noreferrer">View posting ${externalIcon}</a>
         </article>`).join('');
@@ -334,15 +414,18 @@
     Object.values(controls).forEach(control => control.addEventListener(control.tagName === 'INPUT' ? 'input' : 'change', render));
     document.getElementById('reset').addEventListener('click', () => { Object.values(controls).forEach(control => control.value = ''); render(); controls.search.focus(); });
     document.getElementById('downloadCsv').addEventListener('click', () => {
-      const cols = ['Company','Title','Location','Type','Posted','Pay','Experience','Notes','Link'];
+      const cols = ['Company','Title','Location','Type','Posted','Pay','Experience','Notes','Source','Link'];
       const quote = value => `"${String(value).replace(/"/g, '""')}"`;
-      const csv = [cols, ...jobs.map(j => [j.company,j.title,j.location,j.type,j.posted,j.pay,j.experience,j.notes,j.url])].map(row => row.map(quote).join(',')).join('\r\n');
+      const csv = [cols, ...jobs.map(j => [j.company,j.title,j.location,j.type,j.posted,j.pay,j.experience,j.notes,j.source,j.url])].map(row => row.map(quote).join(',')).join('\r\n');
       const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
       const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob); link.download = 'validated-jobs-2026-09-29.csv';
+      link.href = URL.createObjectURL(blob); link.download = activeTab === 'claude' ? 'claude-jobs-2026-10-15.csv' : 'validated-jobs-2026-09-29.csv';
       document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(link.href);
     });
-    render();
+    document.getElementById('tabValidated').addEventListener('click', () => setTab('validated'));
+    document.getElementById('tabClaude').addEventListener('click', () => setTab('claude'));
+    document.getElementById('claudeCount').textContent = claudeJobs.length;
+    setTab(location.hash === '#claude' ? 'claude' : 'validated');
   </script>
 </body>
 </html>
