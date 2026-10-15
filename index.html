@@ -114,8 +114,12 @@
     .src-badge.indeed { background: var(--accent-soft); color: var(--accent-strong); }
     .src-col, .field-source { display: none; }
     .show-source .src-col { display: table-cell; }
-    .controls.show-source .field-source { display: block; }
-    .controls.show-source { grid-template-columns: minmax(260px, 1.4fr) repeat(4, minmax(130px, .6fr)) auto; }
+        .subtabs { display: none; gap: 8px; margin: 0 0 14px; flex-wrap: wrap; }
+    .subtabs.on { display: flex; }
+    .subtab { min-height: 38px; padding: 7px 15px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--muted); font: 600 13px "IBM Plex Sans", sans-serif; cursor: pointer; }
+    .subtab:hover { color: var(--ink); }
+    .subtab[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+    .subtab .count { margin-left: 6px; font-family: "IBM Plex Mono", monospace; font-size: 11px; opacity: .8; }
     .controls {
       margin-top: 22px; display: grid; grid-template-columns: minmax(280px, 1.5fr) repeat(3, minmax(150px, .65fr)) auto;
       gap: 10px; align-items: end; padding: 15px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
@@ -167,7 +171,7 @@
     .source-note { margin: 16px 2px 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
     .source-note strong { color: var(--ink); }
     @media (max-width: 1100px) {
-      .controls, .controls.show-source { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .field-search { grid-column: 1 / -1; }
       .reset { justify-self: start; }
       .table-shell { display: none; }
@@ -214,6 +218,11 @@
       <button class="tab" role="tab" id="tabValidated" aria-selected="true" type="button">Validated<span class="count">29</span></button>
       <button class="tab" role="tab" id="tabClaude" aria-selected="false" type="button">Claude<span class="count" id="claudeCount">0</span></button>
     </div>
+    <div class="subtabs" id="subtabs" role="group" aria-label="Filter Claude finds by source">
+      <button class="subtab" type="button" data-src="" aria-pressed="true">All<span class="count" id="subAll">0</span></button>
+      <button class="subtab" type="button" data-src="LinkedIn" aria-pressed="false">LinkedIn<span class="count" id="subLinkedIn">0</span></button>
+      <button class="subtab" type="button" data-src="Indeed" aria-pressed="false">Indeed<span class="count" id="subIndeed">0</span></button>
+    </div>
     <section class="intro" aria-labelledby="page-title">
       <div>
         <div class="eyebrow"><span class="pulse" aria-hidden="true"></span><span id="eyebrowText">Validated snapshot · Sep 29, 2026</span></div>
@@ -245,10 +254,7 @@
         <label for="family">Role family</label>
         <select id="family"></select>
       </div>
-      <div class="field field-source">
-        <label for="source">Source</label>
-        <select id="source"><option value="">All sources</option><option>LinkedIn</option><option>Indeed</option></select>
-      </div>
+      <select id="source" hidden><option value="">All sources</option><option>LinkedIn</option><option>Indeed</option></select>
       <div class="field">
         <label for="mode">Work mode</label>
         <select id="mode"><option value="">All modes</option><option>Remote</option><option>Onsite</option><option>Hybrid</option></select>
@@ -341,7 +347,10 @@
       jobs = isClaude ? claudeJobs : validatedJobs;
       document.getElementById('tabValidated').setAttribute('aria-selected', String(!isClaude));
       document.getElementById('tabClaude').setAttribute('aria-selected', String(isClaude));
-      document.getElementById('controls').classList.toggle('show-source', isClaude);
+      document.getElementById('subtabs').classList.toggle('on', isClaude);
+      document.getElementById('subAll').textContent = claudeJobs.length;
+      document.getElementById('subLinkedIn').textContent = claudeJobs.filter(j => j.source === 'LinkedIn').length;
+      document.getElementById('subIndeed').textContent = claudeJobs.filter(j => j.source === 'Indeed').length;
       document.getElementById('tableShell').classList.toggle('show-source', isClaude);
       Object.values(controls).forEach(c => c.value = '');
       setFamilies(isClaude ? CLAUDE_FAMILIES : VALIDATED_FAMILIES);
@@ -385,6 +394,7 @@
     }
 
     function render() {
+      document.querySelectorAll('.subtab').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.src === controls.source.value)));
       const filtered = jobs.filter(matches);
       rowHost.innerHTML = filtered.map(job => `
         <tr>
@@ -422,6 +432,7 @@
       link.href = URL.createObjectURL(blob); link.download = activeTab === 'claude' ? 'claude-jobs-2026-10-15.csv' : 'validated-jobs-2026-09-29.csv';
       document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(link.href);
     });
+    document.querySelectorAll('.subtab').forEach(b => b.addEventListener('click', () => { controls.source.value = b.dataset.src; render(); }));
     document.getElementById('tabValidated').addEventListener('click', () => setTab('validated'));
     document.getElementById('tabClaude').addEventListener('click', () => setTab('claude'));
     document.getElementById('claudeCount').textContent = claudeJobs.length;

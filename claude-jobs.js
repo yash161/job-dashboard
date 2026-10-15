@@ -211,7 +211,7 @@ window.claudeJobs = [
 {
 "company": "Fandom",
 "title": "Senior Cloud Engineer",
-"location": "San Francisco Bay Area",
+"location": "San Francisco Bay Area, CA",
 "type": "Full-time",
 "posted": "Oct 15, 2026",
 "pay": "Not listed",
@@ -227,7 +227,7 @@ window.claudeJobs = [
 {
 "company": "Fonzi AI",
 "title": "Infrastructure Engineer",
-"location": "San Francisco Bay Area",
+"location": "San Francisco Bay Area, CA",
 "type": "Full-time",
 "posted": "Oct 15, 2026",
 "pay": "Not listed",
@@ -371,7 +371,7 @@ window.claudeJobs = [
 {
 "company": "Revolution Medicines",
 "title": "Scientific Computer Engineer, Staff Cloud Infrastructure",
-"location": "San Francisco Bay Area",
+"location": "San Francisco Bay Area, CA",
 "type": "Full-time",
 "posted": "Oct 15, 2026",
 "pay": "Not listed",
@@ -1171,7 +1171,7 @@ window.claudeJobs = [
 {
 "company": "Donnelly & Moore Corporation",
 "title": "AI Agent Developer (contract)",
-"location": "New York",
+"location": "New York, NY",
 "type": "Contract",
 "posted": "Oct 15, 2026",
 "pay": "Not listed",
@@ -1555,7 +1555,7 @@ window.claudeJobs = [
 {
 "company": "Greystar",
 "title": "Sr Data Engineer",
-"location": "South Carolina",
+"location": "South Carolina, SC",
 "type": "Full-time",
 "posted": "Oct 15, 2026",
 "pay": "Not listed",
@@ -2771,7 +2771,7 @@ window.claudeJobs = [
 {
 "company": "Brooksource",
 "title": "DevSecOps Engineer",
-"location": "Philadelphia",
+"location": "Philadelphia, PA",
 "type": "Full-time",
 "posted": "Oct 12, 2026",
 "pay": "From $150,000",
@@ -2787,7 +2787,7 @@ window.claudeJobs = [
 {
 "company": "Aquent",
 "title": "DevOps Engineer [213572] (contract)",
-"location": "Westlake",
+"location": "Westlake, TX",
 "type": "Contract",
 "posted": "Oct 12, 2026",
 "pay": "$65-$75/hr",
@@ -3651,7 +3651,7 @@ window.claudeJobs = [
 {
 "company": "CuraFi",
 "title": "Senior Software Engineer",
-"location": "San Francisco",
+"location": "San Francisco, CA",
 "type": "Full-time",
 "posted": "Oct 6, 2026",
 "pay": "$180,000-$210,000",
@@ -3843,7 +3843,7 @@ window.claudeJobs = [
 {
 "company": "Anchor Point Technology Resources",
 "title": "Senior Azure DevOps Engineer",
-"location": "Carmel",
+"location": "Carmel, IN",
 "type": "Full-time",
 "posted": "Sep 23, 2026",
 "pay": "$130,000-$150,000",
@@ -4179,7 +4179,7 @@ window.claudeJobs = [
 {
 "company": "Hard Rock International",
 "title": "Devops Engineer III",
-"location": "Davie",
+"location": "Davie, FL",
 "type": "Full-time",
 "posted": "Aug 28, 2026",
 "pay": "$90,206-$134,455",
